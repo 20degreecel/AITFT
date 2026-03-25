@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.npy
+data/*.csv
+data/davis_*.txt
+Methodology_Word/*.docx
+.ipynb_checkpoints/
+REINVENT4/
