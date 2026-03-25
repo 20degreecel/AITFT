@@ -1,0 +1,6 @@
+streamlit
+torch
+rdkit
+pandas
+numpy
+watchdog
