@@ -8,15 +8,19 @@ st.title("🧪 AITFT: AI Drug Discovery R&D Hub")
 st.sidebar.title("Navigation")
 selection = st.sidebar.radio("Go to", ["Project Overview", "Methodology & Docs", "Data Exploration", "Model Inference", "Research Library"])
 
-# Paths
-BRAIN_DIR = r"c:\Users\teoyo\Downloads\VSCODE\AITFT\ag-brain"
-WORD_DIR = r"c:\Users\teoyo\Downloads\VSCODE\AITFT\Methodology_Word"
-DATA_FILE = r"c:\Users\teoyo\Downloads\VSCODE\AITFT\data\davis_processed.csv"
+# Paths (Refactored to relative for cloud compatibility)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BRAIN_DIR = os.path.join(BASE_DIR, "ag-brain")
+WORD_DIR = os.path.join(BASE_DIR, "Methodology_Word")
+DATA_FILE = os.path.join(BASE_DIR, "data", "davis_processed.csv")
+MODEL_PATH = os.path.join(BASE_DIR, "smartdti_baseline.pth")
+RESEARCH_LOG = os.path.join(BRAIN_DIR, "research_log.md")
+TASK_FILE = os.path.join(BRAIN_DIR, "task.md")
 
 if selection == "Project Overview":
     st.header("Project Status & Roadmap")
-    if os.path.exists(os.path.join(BRAIN_DIR, "task.md")):
-        with open(os.path.join(BRAIN_DIR, "task.md"), "r", encoding="utf-8") as f:
+    if os.path.exists(TASK_FILE):
+        with open(TASK_FILE, "r", encoding="utf-8") as f:
             st.markdown(f.read())
 
 elif selection == "Methodology & Docs":
@@ -69,11 +73,10 @@ elif selection == "Model Inference":
             return res + [0] * (max_len - len(res))
 
         model = SmartDTI_Baseline()
-        model_path = r"c:\Users\teoyo\Downloads\VSCODE\AITFT\smartdti_baseline.pth"
         
-        if os.path.exists(model_path):
+        if os.path.exists(MODEL_PATH):
             try:
-                model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+                model.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device('cpu')))
                 model.eval()
                 
                 s_idx = torch.LongTensor([label_smiles(smiles_input)])
