@@ -21,14 +21,51 @@ RESEARCH_LOG = os.path.join(BRAIN_DIR, "research_log.md")
 TASK_FILE = os.path.join(BRAIN_DIR, "task.md")
 
 if selection == "Project Overview":
-    st.header("Project Status & Roadmap")
+    st.header("🏢 AITFT: AI-Driven Drug Discovery R&D Hub")
+    st.markdown("""
+    ### 🔬 Vision
+    The AITFT Hub integrates cutting-edge Generative AI and Deep Learning to streamline the early-stage drug discovery process. 
+    By automating the **Design-Filter-Screen** cycle, we aim to reduce lead-optimization timelines by over 40%.
+
+    ### 🏗️ Pipeline Architecture
+    1. **DANOVO (Generative Module)**: Uses a Recurrent Neural Network (RNN) to 'design' novel molecular SMILES based on chemical linguistics.
+    2. **Smart Gatekeeper (Filtering Module)**: A multi-layered sieve that eliminates candidates with poor drug-likeness (Lipinski's Rules) or high toxicity risks.
+    3. **SmartDTI (Affinity Prediction)**: A CNN-CNN hybrid model that predicts the binding strength ($pK_d$) between the designed ligand and a target protein.
+    4. **DAPRE (Future Validation)**: Advanced refinement using Molecular Dynamics and Schrödinger workflow integration.
+
+    ### 📈 Expected ROI
+    - **Time Savings**: Reduction in 'Hit-to-Lead' cycle from 12+ months to 6-8 months.
+    - **Cost Efficiency**: Optimized virtual screening reducing the need for costly wet-lab assays in early stages.
+    """)
+    st.divider()
+    st.subheader("Current Roadmap")
     if os.path.exists(TASK_FILE):
         with open(TASK_FILE, "r", encoding="utf-8") as f:
             st.markdown(f.read())
 
 elif selection == "Methodology & Docs":
-    st.header("Technical Methodologies")
-    doc_files = [f for f in os.listdir(BRAIN_DIR) if f.endswith(".md") and "Methodology" in f or "Workflow" in f or "Proposal" in f]
+    st.header("📚 Technical Methodologies")
+    
+    st.markdown("""
+    #### 1. DANOVO (De Novo Generative Design)
+    - **Model Type**: SmilesRNN (GRU-based)
+    - **Concept**: Treat molecular SMILES strings as a 'language'. The model learns the probability of the next atom/bond character given previous ones.
+    - **Objective**: Explore the vast chemical space (estimated $10^{60}$ molecules) to find novel structures beyond traditional chemical libraries.
+
+    #### 2. Smart Gatekeeper (Chemical Intelligence)
+    - **Filtering Tier 1**: Physicochemical Properties (MW < 500, LogP < 5, HBD < 5, HBA < 10).
+    - **Filtering Tier 2**: PAINS (Pan-Assay Interference Compounds) detection to avoid false positives.
+    - **Goal**: 'Fail Fast, Fail Cheap' – filtering out non-drug-like molecules before expensive calculations.
+
+    #### 3. SmartDTI (Drug-Target Interaction)
+    - **Architecture**: Dual CNN Channels (1D Convolution on Ligand + 1D Convolution on Protein).
+    - **Baseline Accuracy**: Trained on the **DAVIS Benchmark** (30,056 records). Current Loss: **0.61**.
+    - **Interpretation**: Higher predicted $pK_{d}$ values indicate a stronger, more favorable binding affinity.
+    """)
+    
+    st.divider()
+    st.subheader("Reference Artifacts")
+    doc_files = [f for f in os.listdir(BRAIN_DIR) if f.endswith(".md") and ("Methodology" in f or "Workflow" in f or "Proposal" in f)]
     selected_doc = st.selectbox("Select a Document to View", doc_files)
     
     if selected_doc:
