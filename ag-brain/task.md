@@ -12,7 +12,7 @@
 - [/] Implementation Phase: SmartDTI & DANOVO Prototyping
     - [x] Environment Setup (PyTorch, RDKit, Pandas)
     - [x] Data Collection & Preprocessing (DAVIS Benchmark)
-    - [/] Baseline SmartDTI Model (Training & Evaluation)
+    - [x] Baseline SmartDTI Model (Training & Evaluation)
         - [x] Initial training completed (Loss 0.61)
-        - [/] Fix Streamlit Cloud deployment (Branch/Path detection)
-    - [ ] DANOVO-REINVENT Integration Prototype
+        - [x] Fix Streamlit Cloud deployment (Branch/Path detection)
+    - [x] DANOVO-REINVENT Integration Prototype (Standalone)
