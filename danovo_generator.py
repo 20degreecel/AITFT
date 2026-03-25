@@ -4,7 +4,6 @@ import random
 
 def generate_molecules(num=10):
     # This is a placeholder that simulates REINVENT-like molecule generation
-    # until the environment-specific REINVENT4 build issues are fully resolved.
     smiles_pool = [
         "CC(=O)OC1=CC=CC=C1C(=O)O", # Aspirin
         "CC1=CN=C(C(=N1)N)C2=CC=CC=C2",

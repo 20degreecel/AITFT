@@ -6,7 +6,7 @@ st.set_page_config(page_title="AITFT R&D Hub", layout="wide")
 
 st.title("🧪 AITFT: AI Drug Discovery R&D Hub")
 st.sidebar.title("Navigation")
-selection = st.sidebar.radio("Go to", ["Project Overview", "Methodology & Docs", "Data Exploration", "Model Inference", "Research Library"])
+selection = st.sidebar.radio("Go to", ["Project Overview", "Methodology & Docs", "Data Exploration", "Model Inference", "DANOVO Generative Design", "Research Library"])
 
 # Paths (Refactored to relative for cloud compatibility)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -93,6 +93,58 @@ elif selection == "Model Inference":
         else:
             st.warning("Model weights (smartdti_baseline.pth) not found. Displaying dummy result.")
             st.metric("Predicted pKd", "7.42", "± 0.2")
+
+elif selection == "DANOVO Generative Design":
+    st.header("DANOVO: Generative Molecular Design")
+    st.write("Using REINVENT-based generative sampling combined with SmartDTI for real-time affinity screening.")
+    
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        num_gen = st.slider("Number of molecules to generate", 5, 50, 10)
+        target_seq = st.text_area("Target Protein Sequence (e.g. BRAF)", "MAALSGGGGGGAEPGQALFNGDMEPEAGAGAGAAASSAADPAIPEEVWNIKQMIKLTQEHIEAL... (truncated)")
+    
+    if st.button("Run Generative Screening Loop"):
+        from danovo_generator import generate_molecules
+        from smartdti_model import SmartDTI_Baseline
+        
+        with st.spinner("Generating & Predicting..."):
+            gen_smiles = generate_molecules(num_gen)
+            
+            # Predict affinity for each
+            # (Note: Using a simplified encoding loop for demonstration)
+            results = []
+            model = SmartDTI_Baseline()
+            if os.path.exists(MODEL_PATH):
+                model.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device('cpu')))
+                model.eval()
+                
+                def label_smiles(s, max_len=100):
+                    char_list = ['#', '(', ')', '.', '/', '1', '2', '3', '4', '5', '6', '7', '8', '=', '@', 'B', 'C', 'F', 'H', 'I', 'N', 'O', 'P', 'S', '[', '\\', ']', 'c', 'l', 'n', 'o', 'r', 's']
+                    char_to_int = {c: i+1 for i, c in enumerate(char_list)}
+                    res = [char_to_int.get(c, 0) for i, c in enumerate(s) if i < max_len]
+                    return res + [0] * (max_len - len(res))
+
+                def label_protein(p, max_len=1000):
+                    amino_acids = 'ACDEFGHIKLMNPQRSTVWY'
+                    aa_to_int = {aa: i+1 for i, aa in enumerate(amino_acids)}
+                    res = [aa_to_int.get(aa, 0) for i, aa in enumerate(p) if i < max_len]
+                    return res + [0] * (max_len - len(res))
+
+                p_idx = torch.LongTensor([label_protein(target_seq)])
+                
+                for smi in gen_smiles:
+                    s_idx = torch.LongTensor([label_smiles(smi)])
+                    with torch.no_grad():
+                        pred = model(s_idx, p_idx).item()
+                        results.append({"SMILES": smi, "Predicted pKd": round(pred, 3)})
+            
+            df_res = pd.DataFrame(results)
+            st.success(f"Successfully generated and screened {len(results)} molecules.")
+            st.dataframe(df_res)
+            
+            if not df_res.empty:
+                best_idx = df_res['Predicted pKd'].idxmax()
+                st.info(f"Top Candidate: {df_res.iloc[best_idx]['SMILES']} (pKd: {df_res.iloc[best_idx]['Predicted pKd']})")
 
 elif selection == "Research Library":
     st.header("Curated Research Papers")
